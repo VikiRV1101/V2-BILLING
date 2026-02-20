@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Bakery POS</title>
+    <link rel="stylesheet" href="css/style.css?v=2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="login-body">
+    <div class="login-wrapper">
+        <div class="login-side-image">
+            <h1 style="font-size: 3rem; margin-bottom: 20px; font-family: 'Playfair Display', serif;">V-BAKERY</h1>
+            <p style="font-size: 1.2rem; opacity: 0.9;">"Baking memories since 2026. Every bite is a piece of art."</p>
+        </div>
+        <div class="login-form-container">
+            <div class="login-header">
+                <h2>Welcome Back</h2>
+                <p>Please enter your credentials to continue</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label style="font-weight: 600; margin-bottom: 10px; display: block;">Username</label>
+                    <div class="product-search-bar" style="margin-bottom: 0;">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" class="search-input" required placeholder="Your username">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 30px;">
+                    <label style="font-weight: 600; margin-bottom: 10px; display: block;">Password</label>
+                    <div class="product-search-bar" style="margin-bottom: 0;">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" class="search-input" required placeholder="Your password">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" style="padding: 18px; font-size: 1.1rem;">
+                    Sign In <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            <div id="loginMessage"
+                style="color: var(--danger); margin-top: 20px; text-align: center; font-weight: 500;"></div>
+        </div>
+    </div>
+
+    <a href="https://wa.me/919360039283" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const msg = document.getElementById('loginMessage');
+
+            try {
+                const session = await login(user, pass);
+                window.location.href = session.role === 'admin' ? 'admin.html' : 'staff.html';
+            } catch (err) {
+                msg.textContent = err.message;
+            }
+        });
+
+        window.addEventListener('load', () => {
+            const session = getSession();
+            if (session) {
+                window.location.href = session.role === 'admin' ? 'admin.html' : 'staff.html';
+            }
+        });
+    </script>
+</body>
+
+</html>
