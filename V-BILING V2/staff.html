@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard - Bakery POS</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <div id="printArea"></div>
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <i class="fas fa-bread-slice"></i>
+                </div>
+                <div class="logo-text">V-BAKERY</div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item"><a href="#" onclick="showModule('billing')" class="menu-link active"
+                        id="link-billing"><i class="fas fa-calculator"></i> <span>POS Billing</span></a></li>
+                <li class="menu-item"><a href="#" onclick="showModule('orders')" class="menu-link" id="link-orders"><i
+                            class="fas fa-shopping-bag"></i> <span>Orders</span></a></li>
+                <li class="menu-item"><a href="#" onclick="showModule('attendance')" class="menu-link"
+                        id="link-attendance"><i class="fas fa-calendar-check"></i> <span>Attendance</span></a></li>
+                <li class="menu-item"
+                    style="margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
+                    <a href="#" onclick="logout()" class="menu-link text-danger"><i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span></a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <div class="header-title">
+                    <h1 id="moduleTitle">POS Billing</h1>
+                    <p id="moduleSubtitle">Manage sales and invoicing</p>
+                </div>
+                <div class="header-actions">
+                    <div class="theme-switch" onclick="toggleTheme()"></div>
+                    <div class="user-profile flex align-center gap-15 card"
+                        style="padding: 10px 20px; border-radius: 15px; flex-direction: row; display: flex;">
+                        <div class="avatar"
+                            style="width: 40px; height: 40px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span id="userName" style="font-weight: 600;">Staff</span>
+                    </div>
+                </div>
+            </header>
+
+            <div id="billingModule" class="module"></div>
+            <div id="ordersModule" class="module" style="display:none;"></div>
+            <div id="attendanceModule" class="module" style="display:none;"></div>
+        </main>
+    </div>
+
+    <!-- Weight Selection Modal -->
+    <div id="weightModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <h3 style="margin-bottom: 20px;">Select Weight</h3>
+            <div class="grid grid-2" style="gap: 15px; margin-bottom: 20px;">
+                <button class="btn btn-outline" onclick="selectWeight(0.1)">100g</button>
+                <button class="btn btn-outline" onclick="selectWeight(0.15)">150g</button>
+                <button class="btn btn-outline" onclick="selectWeight(0.2)">200g</button>
+                <button class="btn btn-outline" onclick="selectWeight(0.25)">250g</button>
+                <button class="btn btn-outline" onclick="selectWeight(0.5)">500g</button>
+                <button class="btn btn-primary" onclick="selectWeight(1)">1kg</button>
+            </div>
+
+            <div style="border-top: 1px solid #dee2e6; padding-top: 15px; margin-top: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500;">Custom Weight (kg)</label>
+                <div class="flex gap-10">
+                    <input type="number" id="manualWeightInput" class="form-control" placeholder="e.g. 0.35 for 350g"
+                        step="0.01">
+                    <button class="btn btn-primary" onclick="selectManualWeight()">Add</button>
+                </div>
+            </div>
+            <button class="btn btn-danger btn-block" onclick="closeModal('weightModal')">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/db.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/billing.js"></script>
+    <script src="js/print.js"></script>
+    <script src="js/attendance.js"></script>
+    <script src="js/orders.js"></script>
+    <script src="js/backup.js"></script>
+    <script>
+        const session = checkAuth('staff');
+        if (session) {
+            document.getElementById('userName').textContent = session.name;
+        }
+
+        function showModule(moduleId) {
+            document.querySelectorAll('.module').forEach(m => m.style.display = 'none');
+            const mod = document.getElementById(moduleId + 'Module');
+            if (mod) mod.style.display = 'block';
+
+            document.getElementById('moduleTitle').textContent = moduleId.charAt(0).toUpperCase() + moduleId.slice(1);
+
+            // Sidebar active class
+            document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
+            const activeLink = document.getElementById('link-' + moduleId);
+            if (activeLink) activeLink.classList.add('active');
+
+            const funcName = `load${moduleId.charAt(0).toUpperCase() + moduleId.slice(1)}`;
+            if (window[funcName]) window[funcName]();
+        }
+
+        window.addEventListener('load', async () => {
+            await initDB();
+            showModule('billing');
+        });
+    </script>
+    <a href="https://wa.me/919360039283" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+</body>
+
+</html>
